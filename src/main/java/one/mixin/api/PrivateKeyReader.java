@@ -70,15 +70,13 @@ class PrivateKeyReader {
   private static Map<String, PrivateKey> keyCache =
     Collections.synchronizedMap(new HashMap<String, PrivateKey>());
 
-  protected final String fileName;
+  protected InputStream inputStream;
 
   /**
    * Create a PEM private key file reader.
-   * 
-   * @param fileName The name of the PEM file
    */
-  public PrivateKeyReader(String fileName) {
-    this.fileName = fileName;
+  public PrivateKeyReader(InputStream inputStream) {
+    this.inputStream = inputStream;
   }
 
   /**
@@ -91,12 +89,14 @@ class PrivateKeyReader {
   public PrivateKey getPrivateKey() throws IOException, GeneralSecurityException 
   {
     PrivateKey key = null;
-    FileInputStream fis = null;
+    InputStream fis = null;
     boolean isRSAKey = false;
     try {
+        /*
         File f = new File(fileName);
         fis = new FileInputStream(f);
-
+        */
+        fis = inputStream;
         BufferedReader br = new BufferedReader(new InputStreamReader(fis));
         StringBuilder builder = new StringBuilder();
         boolean inKey = false;

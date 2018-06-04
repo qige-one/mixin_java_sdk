@@ -1,13 +1,8 @@
 package one.mixin.api;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-
-import org.apache.commons.codec.binary.Hex;
-
-import java.security.MessageDigest;
+import java.io.IOException;
 import java.util.Base64;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 import okhttp3.OkHttpClient;
@@ -17,42 +12,8 @@ import okhttp3.WebSocketListener;
 
 public class MixinBot {
 
-  private static class JWTTokenGen {
-
-    static String genToken(String uri, String body) {
-      return genToken(uri, body, UUID.randomUUID().toString());
-    }
-
-    private static String genToken(String uri, String body, String jti) {
-      String sig = genSig("GET", uri, body);
-      long ts = System.currentTimeMillis();
-      String token =
-        JWT
-          .create()
-          .withClaim("uid", Config.APP_ID)
-          .withClaim("sid", Config.SESSION_ID)
-          .withIssuedAt(new Date(ts))
-          .withExpiresAt(new Date(ts + 1 * 60 * 60 * 1000L))
-          .withClaim("sig", sig)
-          .withClaim("jti", jti)
-          .sign(Algorithm.RSA512(null, Config.RSA_PRIVATE_KEY));
-      return token;
-    }
-
-    private static String genSig(String method, String uri, String body) {
-      try {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        return Hex.encodeHexString(md.digest((method + uri + body).getBytes()));
-      } catch (Exception e) {
-        e.printStackTrace();
-        System.exit(1);
-        return null;
-      }
-    }
-  }
-
   public static WebSocket connectToRemoteMixin(WebSocketListener callback) {
-    String token = JWTTokenGen.genToken("/", "");
+    String token = MixinUtil.JWTTokenGen.genToken("/", "");
     OkHttpClient client = new OkHttpClient.Builder().build();
     Request request = new Request.Builder()
       .addHeader("Sec-WebSocket-Protocol", "MixinBot-Blaze-1")
@@ -135,9 +96,49 @@ public class MixinBot {
         recipientId,
         UUID.randomUUID().toString(),
         Category.PLAIN_CONTACT,
-        toBase64(toBase64(String.format("{'user_id': '%s'}".replaceAll("'", "\""), contactId)))
+        toBase64(String.format("{'user_id': '%s'}".replaceAll("'", "\""), contactId))
       );
     return send(webSocket, Action.CREATE_MESSAGE, params);
+  }
+
+  private static HashMap<String, String> makeHeaders(String token) {
+    HashMap<String, String> headers = new HashMap<String, String>();
+    headers.put("Mixin-Device-Id", Config.ADMIN_ID);
+    headers.put("Content-Type", "application/json");
+    headers.put("Authorization", "Bearer " + token);
+    return headers;
+  }
+
+  /*
+  public static String assets() {
+    String token = MixinUtil.JWTTokenGen.genToken("GET", "/assets", "");
+    String res = api.basic.RestAPI.get(
+      "https://api.mixin.one/assets",
+      makeHeaders(token)
+    );
+    return res;
+  }
+  */
+
+  public static void transferTo(
+    String assetId,
+    String counterUserIid,
+    double amount) throws IOException {
+    String body =
+      String.format(
+        ("{'asset_id':'%s', 'counter_user_id':'%s', 'amount':'%s', 'memo':'hello', 'pin':'%s', " +
+          "'trace_id': '%s'}").replaceAll("'", "\""),
+        assetId,
+        counterUserIid,
+        amount,
+        MixinUtil.encryptPayKey(Config.PIN, Config.PAY_KEY),
+        UUID.randomUUID().toString());
+    String token = MixinUtil.JWTTokenGen.genToken("POST", "/transfers", body);
+    String res = MixinHttpUtil.post(
+      "https://api.mixin.one/transfers",
+      makeHeaders(token),
+      body
+    );
   }
 
   private static String toBase64(String orig) {

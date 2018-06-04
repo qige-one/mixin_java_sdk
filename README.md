@@ -11,19 +11,19 @@
 - mixin_dev_resource: https://github.com/myrual/mixin_dev_resource
 - MiXin_Player：https://github.com/albertschr/MiXin_Player
 
-# Java SDK v0.1
+# Java SDK v0.2
 
-当前版本 v0.1，主要功能是 Mixin 机器人：
+当前版本 v0.2，主要功能是 Mixin 机器人：
 
 - 发送文本消息、回复文本消息；
 - 发送表情消息、回复表情消息；
 - 确认收到文本、表情等消息（使得对方界面的消息确认由单钩变双钩）；
-- 发送、共享联系人；
-- 发送、共享小程序及机器人。
+- 发送、共享联系人，发送、共享小程序及机器人。
+- 获钱包余额、转账给他人。
 
-下一版本 v0.2 即将添加的功能：
+下一版本 v0.3 即将添加的功能：
 
-- 转账、收款。
+- 群聊
 
 # 使用协议
 

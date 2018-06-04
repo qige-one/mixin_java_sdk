@@ -21,7 +21,8 @@ public class Config {
   private static RSAPrivateKey loadPrivateKey() {
     try {
       PrivateKey key =
-        new PrivateKeyReader("src/main/resources/rsa_private_key.txt").getPrivateKey();
+        new PrivateKeyReader(Config.class.getResourceAsStream("src/main/resources/rsa_private_key.txt"))
+          .getPrivateKey();
       return (RSAPrivateKey) key;
     } catch (Exception e) {
       e.printStackTrace();
@@ -31,4 +32,6 @@ public class Config {
   }
 
   public static final RSAPrivateKey RSA_PRIVATE_KEY = loadPrivateKey();
+  
+  public static final byte[] PAY_KEY = MixinUtil.decrypt(RSA_PRIVATE_KEY, TOKEN, SESSION_ID);
 }

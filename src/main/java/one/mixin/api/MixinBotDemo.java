@@ -75,6 +75,12 @@ public class MixinBotDemo {
                   userId,
                   "0c21b607-5e5b-461b-963f-95708346c21d");
 
+                MixinBot.transferTo(
+                  "965e5c6e-434c-3fa9-b780-c50f43cd955c", // CNB
+                  userId,
+                  1.0
+                );
+
                 break;
               default:
                 System.out.println("Category: " + category);
