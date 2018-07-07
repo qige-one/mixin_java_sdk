@@ -28,7 +28,7 @@
 # 使用协议
 
 - 本 Java SDK 开源、免费、无偿使用
-- 唯一要求是当你用本 SDK 开发了 Mixin 小程序或机器人时，通过回复[这里](https://github.com/qige-one/mixin_java_sdk/issues/1)告知我一声。
+- 唯一要求是当你用本 SDK 开发了 Mixin 小程序或机器人时，通过回复[这里](https://github.com/qige-one/mixin_java_sdk/issues/2)告知我一声。
 
 # Powered By
 
